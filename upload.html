@@ -1,0 +1,44 @@
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eSewa MP — Upload Documents</title>
+<link rel="stylesheet" href="css/style.css">
+
+<div class="gov-strip" data-i18n="govt_mp">मध्य प्रदेश शासन</div>
+<header class="site-header">
+  <div class="bar">
+    <a href="index.html" class="logo-badge" style="text-decoration:none">MP<br>eSEVA</a>
+    <div class="brand">
+      <h1 data-i18n="upload_title">दस्तावेज़ अपलोड करें</h1>
+      <p class="muted" data-i18n="svc_info_title">मूल निवास प्रमाण पत्र</p>
+    </div>
+    <div class="header-actions"><button class="lang-toggle">English</button></div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="alert info">
+    <span>ℹ️</span>
+    <div><span data-i18n="upload_hint">स्वीकार्य: PDF, JPG, PNG। स्वतः संपीड़ित व AI-जाँचित।</span>
+      <span class="badge ai" data-i18n="ai_checked">AI जाँचित</span></div>
+  </div>
+
+  <div id="docCards"></div>
+
+  <div class="sticky-cta">
+    <div class="inner">
+      <button class="btn block" id="proceedBtn" disabled data-i18n="proceed_payment">भुगतान हेतु आगे बढ़ें</button>
+    </div>
+  </div>
+</main>
+
+<!-- Free CDN libraries -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+<script src="js/db.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/upload.js"></script>
+<script src="js/presenter.js"></script>

@@ -1,0 +1,148 @@
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eSewa MP — Confirmation</title>
+<link rel="stylesheet" href="css/style.css">
+
+<div class="gov-strip" data-i18n="govt_mp">मध्य प्रदेश शासन</div>
+<header class="site-header">
+  <div class="bar">
+    <a href="index.html" class="logo-badge" style="text-decoration:none">MP<br>eSEVA</a>
+    <div class="brand">
+      <h1 data-i18n="confirm_title">आवेदन जमा हुआ</h1>
+      <p class="muted" data-i18n="svc_info_title">मूल निवास प्रमाण पत्र</p>
+    </div>
+    <div class="header-actions"><button class="lang-toggle">English</button></div>
+  </div>
+</header>
+
+<main class="page" style="max-width:560px">
+  <div class="card center">
+    <div style="font-size:56px">🎉</div>
+    <h2 style="color:var(--green)" data-i18n="confirm_title">आवेदन जमा हुआ</h2>
+    <div class="muted mb" data-i18n="app_number">आवेदन क्रमांक</div>
+    <div class="big-num" id="refNo">DOM-2026-00000</div>
+    <div id="qr" style="display:flex;justify-content:center;margin:16px 0"></div>
+    <div class="info-row"><span class="k" data-i18n="expected_delivery">अपेक्षित वितरण</span><span class="v" id="delivery">—</span></div>
+    <div class="info-row"><span class="k" data-i18n="sla_label">सेवा गारंटी</span><span class="v" data-i18n="sla_value">7 कार्य दिवस</span></div>
+    <button class="btn secondary block mt" id="voiceBtn" data-i18n="read_confirm">🔊 पुष्टि पढ़कर सुनाएँ</button>
+    <button class="btn block mt" id="receiptBtn" data-i18n="download_receipt">⬇ रसीद डाउनलोड करें</button>
+  </div>
+
+  <div class="card">
+    <div class="alert ok" id="smsSent">📱 —</div>
+    <div class="switch-row">
+      <span data-i18n="digilocker_deliver">डिजिलॉकर में भेजें</span>
+      <label class="switch"><input type="checkbox" id="dlToggle"><span class="slider"></span></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="sms_track_title">एसएमएस से ट्रैक करें <span class="badge new">नया</span></h2>
+    <p class="muted mb" data-i18n="sms_track_intro">अपना status जानने के लिए SMS करें:</p>
+    <div class="alert info" style="font-family:monospace;font-size:15px" id="smsTemplate"></div>
+    <div class="info-row"><span class="k" data-i18n="send_to">इस नंबर पर भेजें</span><span class="v">7600000000</span></div>
+    <button class="btn block mt" id="trackBtn" data-i18n="track_status">स्थिति देखें</button>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="js/db.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/presenter.js"></script>
+<script>
+  const profile = dbRequireProfile();
+  const app = JSON.parse(localStorage.getItem("esewa_application") || "null");
+  if (!app || !app.ref) { window.location.href = "index.html"; }
+
+  document.getElementById("refNo").textContent = app.ref;
+
+  // Expected delivery = today + 7 working days (skip Sat/Sun).
+  function addWorkingDays(date, n) {
+    const d = new Date(date);
+    let added = 0;
+    while (added < n) { d.setDate(d.getDate() + 1); const wd = d.getDay(); if (wd !== 0 && wd !== 6) added++; }
+    return d;
+  }
+  const delivery = addWorkingDays(new Date(), 7);
+  function fmtDate(d) { return d.toLocaleDateString(getLang() === "hi" ? "hi-IN" : "en-IN", { day: "numeric", month: "long", year: "numeric" }); }
+  function setDelivery() { document.getElementById("delivery").textContent = fmtDate(delivery); }
+  setDelivery();
+
+  // QR encodes the reference + samagra id.
+  const qrData = `${app.ref}|${profile.samagraId}|DOMICILE`;
+  new QRCode(document.getElementById("qr"), { text: qrData, width: 128, height: 128,
+    colorDark: "#123f76", colorLight: "#ffffff" });
+
+  // Simulated SMS + tracking template.
+  const masked = "XXXXXXX" + profile.samagra.mobile.slice(-3);
+  function applyDyn() {
+    document.getElementById("smsSent").textContent = "📱 " + t("sms_sent") + " " + masked;
+    document.getElementById("smsTemplate").textContent = `${app.ref} ${profile.samagraId} SHOWSTATUS`;
+    setDelivery();
+  }
+  applyDyn();
+  document.addEventListener("langchange", applyDyn);
+
+  // DigiLocker delivery pref.
+  const dlToggle = document.getElementById("dlToggle");
+  dlToggle.checked = localStorage.getItem("esewa_digilocker") === "1";
+  dlToggle.addEventListener("change", () => {
+    localStorage.setItem("esewa_digilocker", dlToggle.checked ? "1" : "0");
+    showToast(dlToggle.checked ? t("digilocker_done") : "DigiLocker off");
+  });
+
+  document.getElementById("trackBtn").addEventListener("click", () => window.location.href = "tracking.html");
+
+  // Voiceover of the whole confirmation.
+  function confirmSpeech() {
+    return [t("confirm_title"), t("app_number") + " " + app.ref.split("").join(" "),
+      t("expected_delivery") + " " + fmtDate(delivery), t("sms_sent") + " " + masked].join(". ");
+  }
+  document.getElementById("voiceBtn").addEventListener("click", () => voiceSpeak(confirmSpeech()));
+  if (localStorage.getItem("esewa_voicemode") === "1") {
+    window.addEventListener("load", () => setTimeout(() => voiceSpeak(confirmSpeech()), 500));
+  }
+
+  // Receipt PDF via pdf-lib.
+  document.getElementById("receiptBtn").addEventListener("click", async () => {
+    try {
+      const { PDFDocument, StandardFonts, rgb } = PDFLib;
+      const pdf = await PDFDocument.create();
+      const page = pdf.addPage([420, 560]);
+      const font = await pdf.embedFont(StandardFonts.Helvetica);
+      const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+      const blue = rgb(0.1, 0.25, 0.46);
+      let y = 520;
+      const line = (txt, f = font, size = 11, color = rgb(0.1,0.14,0.19)) => {
+        page.drawText(txt, { x: 36, y, size, font: f, color }); y -= size + 8;
+      };
+      page.drawRectangle({ x: 0, y: 540, width: 420, height: 20, color: blue });
+      line("eSewa Madhya Pradesh", bold, 16, blue); y -= 4;
+      line("Domicile Certificate - Application Receipt", bold, 11, blue); y -= 8;
+      line("Application No : " + app.ref, bold, 12);
+      line("Applicant      : " + app.name);
+      line("Samagra ID     : " + profile.samagraId);
+      line("Mobile         : " + profile.samagra.mobile);
+      line("Category       : " + profile.samagra.category + (profile.samagra.bpl ? " (BPL)" : ""));
+      line("Fee Paid       : Rs. " + profile.fee + (profile.fee === 0 ? " (Waiver)" : ""));
+      line("Expected By    : " + delivery.toLocaleDateString("en-IN"));
+      line("SLA            : 7 working days (MP LSGA 2010)");
+      y -= 10;
+      line("Track by SMS:", bold, 11, blue);
+      line(app.ref + " " + profile.samagraId + " SHOWSTATUS -> 7600000000", font, 9);
+      y -= 14;
+      line("This is a demo-generated receipt.", font, 8, rgb(0.4,0.45,0.5));
+      const bytes = await pdf.save();
+      const blob = new Blob([bytes], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = app.ref + "-receipt.pdf"; a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      showToast(getLang() === "hi" ? "रसीद बनाने में समस्या" : "Receipt generation failed");
+    }
+  });
+</script>

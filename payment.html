@@ -1,0 +1,67 @@
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eSewa MP — Payment</title>
+<link rel="stylesheet" href="css/style.css">
+
+<div class="gov-strip" data-i18n="govt_mp">मध्य प्रदेश शासन</div>
+<header class="site-header">
+  <div class="bar">
+    <a href="index.html" class="logo-badge" style="text-decoration:none">MP<br>eSEVA</a>
+    <div class="brand">
+      <h1 data-i18n="payment_title">भुगतान</h1>
+      <p class="muted" data-i18n="svc_info_title">मूल निवास प्रमाण पत्र</p>
+    </div>
+    <div class="header-actions"><button class="lang-toggle">English</button></div>
+  </div>
+</header>
+
+<main class="page" style="max-width:520px">
+  <div class="card center">
+    <div class="muted" data-i18n="amount_payable">देय राशि</div>
+    <div class="big-num" id="amount">₹0</div>
+    <div id="bplNote" class="alert ok hidden" style="margin-top:12px"></div>
+  </div>
+
+  <div id="payArea" class="card">
+    <h2 data-i18n="payment_title">भुगतान</h2>
+    <div class="alert info" data-i18n="demo_mode">डेमो मोड — कोई भी इनपुट स्वीकार्य</div>
+    <div class="segmented" id="payTabs">
+      <button data-pay="upi" class="active" data-i18n="pay_upi">यूपीआई</button>
+      <button data-pay="netbank" data-i18n="pay_netbank">नेट बैंकिंग</button>
+      <button data-pay="card" data-i18n="pay_card">डेबिट कार्ड</button>
+    </div>
+
+    <div id="pane-upi" class="paypane">
+      <div class="field"><label>UPI ID</label><input class="input" placeholder="name@bank"></div>
+    </div>
+    <div id="pane-netbank" class="paypane hidden">
+      <div class="field"><label>Bank</label>
+        <select><option>State Bank of India</option><option>Bank of Baroda</option><option>Punjab National Bank</option><option>MP Gramin Bank</option></select>
+      </div>
+    </div>
+    <div id="pane-card" class="paypane hidden">
+      <div class="field"><label>Card Number</label><input class="input" inputmode="numeric" placeholder="•••• •••• •••• ••••"></div>
+      <div class="input-row">
+        <div class="field" style="flex:1"><label>Expiry</label><input class="input" placeholder="MM/YY"></div>
+        <div class="field" style="flex:1"><label>CVV</label><input class="input" inputmode="numeric" placeholder="•••"></div>
+      </div>
+    </div>
+
+    <button class="btn block success" id="payBtn" data-i18n="pay_now">अभी भुगतान करें</button>
+    <button class="btn block secondary mt" id="lskBtn" data-i18n="pay_lsk">लोक सेवा केंद्र पर भुगतान</button>
+  </div>
+
+  <!-- Success overlay -->
+  <div id="successCard" class="card center hidden">
+    <div style="font-size:64px" id="successTick">✅</div>
+    <h2 style="color:var(--green)" data-i18n="pay_success">भुगतान सफल</h2>
+    <div class="muted" id="paidLine"></div>
+  </div>
+</main>
+
+<script src="js/db.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/payment.js"></script>
+<script src="js/presenter.js"></script>

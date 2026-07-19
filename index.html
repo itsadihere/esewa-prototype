@@ -1,0 +1,121 @@
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eSewa MP — Home</title>
+<link rel="stylesheet" href="css/style.css">
+
+<div class="gov-strip" data-i18n="govt_mp">मध्य प्रदेश शासन</div>
+<header class="site-header">
+  <div class="bar">
+    <div class="logo-badge">MP<br>eSEVA</div>
+    <div class="brand">
+      <h1 data-i18n="portal_name">ई-सेवा मध्य प्रदेश</h1>
+      <p id="welcomeLine" class="muted"></p>
+    </div>
+    <div class="header-actions">
+      <button class="lang-toggle">English</button>
+      <button class="btn ghost" id="logoutBtn" style="min-height:40px;padding:0 10px" data-i18n="logout">लॉगआउट</button>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="card">
+    <div class="search-wrap">
+      <input class="input" id="searchInput" data-i18n-ph="search_ph">
+      <button class="mic-btn" id="searchMic" title="Voice search">🎤</button>
+    </div>
+    <button class="btn-voice" id="voiceFormBtn">
+      <span data-i18n="voice_form_btn">🎙️ बातों बातों में फॉर्म भरिये</span>
+      <span class="badge new" data-i18n="new_feature">नया</span>
+    </button>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="popular_services">लोकप्रिय सेवाएँ</h2>
+    <div class="svc-grid" id="svcGrid">
+      <a class="svc-card primary" href="service-info.html" data-svc="domicile">
+        <span class="ico">🏠</span>
+        <span class="name" data-i18n="svc_domicile">मूल निवास प्रमाण पत्र</span>
+      </a>
+      <a class="svc-card disabled" data-svc="income">
+        <span class="ico">💰</span>
+        <span class="name" data-i18n="svc_income">आय प्रमाण पत्र</span>
+        <span class="soon" data-i18n="coming_soon">जल्द आ रहा है</span>
+      </a>
+      <a class="svc-card disabled" data-svc="caste">
+        <span class="ico">📜</span>
+        <span class="name" data-i18n="svc_caste">जाति प्रमाण पत्र</span>
+        <span class="soon" data-i18n="coming_soon">जल्द आ रहा है</span>
+      </a>
+      <a class="svc-card disabled" data-svc="birth">
+        <span class="ico">👶</span>
+        <span class="name" data-i18n="svc_birth">जन्म प्रमाण पत्र</span>
+        <span class="soon" data-i18n="coming_soon">जल्द आ रहा है</span>
+      </a>
+      <a class="svc-card disabled" data-svc="land">
+        <span class="ico">🌾</span>
+        <span class="name" data-i18n="svc_land">भू-अभिलेख (खसरा)</span>
+        <span class="soon" data-i18n="coming_soon">जल्द आ रहा है</span>
+      </a>
+      <a class="svc-card disabled" data-svc="ration">
+        <span class="ico">🍚</span>
+        <span class="name" data-i18n="svc_ration">राशन कार्ड</span>
+        <span class="soon" data-i18n="coming_soon">जल्द आ रहा है</span>
+      </a>
+    </div>
+  </div>
+</main>
+
+<script src="js/db.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/presenter.js"></script>
+<script>
+  const profile = dbRequireProfile();
+  if (profile) {
+    document.getElementById("welcomeLine").textContent =
+      t("welcome") + ", " + profile.samagra.name;
+    document.addEventListener("langchange", () => {
+      document.getElementById("welcomeLine").textContent =
+        t("welcome") + ", " + profile.samagra.name;
+    });
+  }
+
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    localStorage.removeItem("esewa_profile");
+    window.location.href = "login.html";
+  });
+
+  document.getElementById("voiceFormBtn").addEventListener("click", () => {
+    // Enter the domicile journey in voice mode.
+    localStorage.setItem("esewa_voicemode", "1");
+    window.location.href = "service-info.html";
+  });
+
+  // Search: routes "domicile"/"मूल निवास" to the service.
+  function runSearch(q) {
+    q = (q || "").toLowerCase();
+    if (q.includes("domicile") || q.includes("मूल") || q.includes("निवास") || q.includes("nivas")) {
+      window.location.href = "service-info.html";
+    } else if (q.trim()) {
+      showToast(getLang() === "hi" ? "केवल मूल निवास प्रमाण पत्र इस डेमो में सक्रिय है" : "Only Domicile Certificate is active in this demo");
+    }
+  }
+  document.getElementById("searchInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") runSearch(e.target.value);
+  });
+  document.getElementById("searchMic").addEventListener("click", () => {
+    voiceListen(text => {
+      document.getElementById("searchInput").value = text;
+      runSearch(text);
+    });
+  });
+
+  document.querySelectorAll(".svc-card.disabled").forEach(c =>
+    c.addEventListener("click", e => {
+      e.preventDefault();
+      showToast(t("coming_soon"));
+    })
+  );
+</script>

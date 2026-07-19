@@ -1,0 +1,74 @@
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eSewa MP — Login</title>
+<link rel="stylesheet" href="css/style.css">
+
+<div class="gov-strip" data-i18n="govt_mp">मध्य प्रदेश शासन</div>
+<header class="site-header">
+  <div class="bar">
+    <div class="logo-badge">MP<br>eSEVA</div>
+    <div class="brand">
+      <h1 data-i18n="portal_name">ई-सेवा मध्य प्रदेश</h1>
+      <p data-i18n="portal_tag">लोक सेवा प्रदाय पोर्टल</p>
+    </div>
+    <div class="header-actions">
+      <button class="lang-toggle">English</button>
+    </div>
+  </div>
+</header>
+
+<main class="page" style="max-width:460px">
+  <div class="card">
+    <h2 data-i18n="login_title">नागरिक लॉगिन</h2>
+
+    <div class="segmented" id="loginTabs">
+      <button data-tab="otp" class="active" data-i18n="login_otp">ओटीपी</button>
+      <button data-tab="password" data-i18n="login_password">पासवर्ड</button>
+      <button data-tab="biometric" data-i18n="login_biometric">बायोमेट्रिक</button>
+    </div>
+
+    <div class="field">
+      <label data-i18n="samagra_id">समग्र आईडी</label>
+      <input class="input" id="samagraInput" data-i18n-ph="samagra_ph" autocomplete="off">
+    </div>
+
+    <div id="err" class="alert err hidden"></div>
+
+    <!-- OTP flow -->
+    <div id="pane-otp">
+      <button class="btn block" id="sendOtpBtn" data-i18n="send_otp">ओटीपी भेजें</button>
+      <div id="otpBox" class="hidden mt">
+        <div class="alert ok" id="otpMsg"></div>
+        <div class="field">
+          <label data-i18n="enter_otp">6 अंकों का ओटीपी दर्ज करें</label>
+          <input class="input" id="otpInput" inputmode="numeric" maxlength="6" placeholder="••••••">
+        </div>
+        <button class="btn block success" id="verifyOtpBtn" data-i18n="verify_login">सत्यापित कर लॉगिन करें</button>
+      </div>
+    </div>
+
+    <!-- Password flow -->
+    <div id="pane-password" class="hidden">
+      <div class="field">
+        <label data-i18n="login_password">पासवर्ड</label>
+        <input class="input" id="pwInput" type="password" data-i18n-ph="password_ph">
+      </div>
+      <button class="btn block" id="pwLoginBtn" data-i18n="verify_login">सत्यापित कर लॉगिन करें</button>
+    </div>
+
+    <!-- Biometric flow -->
+    <div id="pane-biometric" class="hidden center">
+      <p class="muted mb" data-i18n="biometric_sim">स्कैनर पर उँगली रखें</p>
+      <div id="fingerScan" style="font-size:70px;line-height:1">🫆</div>
+      <button class="btn block mt" id="bioBtn" data-i18n="scan_now">स्कैन सिम्युलेट करें</button>
+    </div>
+
+    <p class="muted mt center">Demo IDs: SMGR001 · SMGR002 · SMGR003</p>
+  </div>
+</main>
+
+<script src="js/db.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/presenter.js"></script>

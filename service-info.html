@@ -1,0 +1,140 @@
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eSewa MP — Domicile Certificate</title>
+<link rel="stylesheet" href="css/style.css">
+
+<div class="gov-strip" data-i18n="govt_mp">मध्य प्रदेश शासन</div>
+<header class="site-header">
+  <div class="bar">
+    <a href="index.html" class="logo-badge" style="text-decoration:none">MP<br>eSEVA</a>
+    <div class="brand">
+      <h1 data-i18n="svc_info_title">मूल निवास प्रमाण पत्र</h1>
+      <p class="muted" data-i18n="lok_seva_ref">म.प्र. लोक सेवा गारंटी अधिनियम, 2010</p>
+    </div>
+    <div class="header-actions">
+      <button class="lang-toggle">English</button>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="card">
+    <div class="spread mb">
+      <h2 data-i18n="svc_info_title">मूल निवास प्रमाण पत्र</h2>
+      <span class="badge simple" data-i18n="simplified">सरल</span>
+    </div>
+    <button class="btn secondary block mb" id="readPageBtn" data-i18n="read_page">🔊 यह पृष्ठ पढ़कर सुनाएँ</button>
+
+    <div class="info-row"><span class="k" data-i18n="sla_label">सेवा गारंटी (SLA)</span><span class="v" data-i18n="sla_value">7 कार्य दिवस</span></div>
+    <div class="info-row"><span class="k" data-i18n="lok_seva_ref">अधिनियम</span><span class="v">MP LSGA 2010</span></div>
+
+    <h3 data-i18n="timeline_label">प्रक्रिया समयरेखा</h3>
+    <ul class="tl">
+      <li data-i18n="stage_submitted">जमा हुआ</li>
+      <li data-i18n="stage_patwari">पटवारी को अग्रेषित</li>
+      <li data-i18n="stage_verify">सत्यापन</li>
+      <li data-i18n="stage_sdm">एसडीएम समीक्षा</li>
+      <li data-i18n="stage_approved">स्वीकृत</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3 data-i18n="fee_slabs">श्रेणी अनुसार शुल्क</h3>
+    <table class="fee-table">
+      <tr><th data-i18n="fee_general">सामान्य</th><td>₹50</td></tr>
+      <tr><th data-i18n="fee_obc">अन्य पिछड़ा वर्ग</th><td>₹30</td></tr>
+      <tr><th data-i18n="fee_scst">अनुसूचित जाति / जनजाति</th><td>₹20</td></tr>
+      <tr><th data-i18n="fee_bpl">बीपीएल (छूट)</th><td>₹0</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="spread mb">
+      <h3 style="margin:0" data-i18n="docs_required">आवश्यक दस्तावेज़</h3>
+      <button class="btn ghost" id="readDocsBtn" style="min-height:40px" data-i18n="read_docs">🔊 सुनाएँ</button>
+    </div>
+    <ul id="docsList" style="padding-left:18px"></ul>
+    <button class="btn secondary block mt" id="digilockerBtn" data-i18n="digilocker_connect">🔗 डिजिलॉकर जोड़ें</button>
+  </div>
+
+  <div class="card">
+    <div class="alert info" id="consentMsg" data-i18n="consent_q">क्या आप आगे बढ़ना चाहते हैं? हाँ या नहीं बोलिए।</div>
+    <button class="btn secondary block mb" id="consentBtn" data-i18n="listen_consent">🎤 आवाज़ से सहमति दें</button>
+    <button class="btn-voice" id="startFormBtn">
+      <span data-i18n="voice_form_btn">🎙️ बातों बातों में फॉर्म भरिये</span>
+    </button>
+  </div>
+</main>
+
+<script src="js/db.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/presenter.js"></script>
+<script>
+  const profile = dbRequireProfile();
+
+  function renderDocs() {
+    const ul = document.getElementById("docsList");
+    ul.innerHTML = "";
+    REQUIRED_DOCS.forEach(d => {
+      const li = document.createElement("li");
+      li.textContent = getLang() === "hi" ? d.hi : d.en;
+      ul.appendChild(li);
+    });
+  }
+  renderDocs();
+  document.addEventListener("langchange", renderDocs);
+
+  function pageSpeech() {
+    return [t("svc_info_title"), t("sla_label") + ": " + t("sla_value"),
+            t("lok_seva_ref"), t("fee_slabs"),
+            t("docs_required") + ": " + REQUIRED_DOCS.map(d => getLang()==="hi"?d.hi:d.en).join(", ")].join(". ");
+  }
+
+  document.getElementById("readPageBtn").addEventListener("click", () => voiceSpeak(pageSpeech()));
+  document.getElementById("readDocsBtn").addEventListener("click", () =>
+    voiceSpeak(t("docs_required") + ": " + REQUIRED_DOCS.map(d => getLang()==="hi"?d.hi:d.en).join(", ")));
+
+  const dlBtn = document.getElementById("digilockerBtn");
+  dlBtn.addEventListener("click", () => {
+    localStorage.setItem("esewa_digilocker", "1");
+    dlBtn.textContent = t("digilocker_done");
+    dlBtn.classList.add("success");
+    showToast(t("digilocker_done"));
+  });
+  if (localStorage.getItem("esewa_digilocker") === "1") {
+    dlBtn.textContent = t("digilocker_done"); dlBtn.classList.add("success");
+  }
+
+  function goForm() { window.location.href = "form.html"; }
+  document.getElementById("startFormBtn").addEventListener("click", () => {
+    localStorage.setItem("esewa_voicemode", "1"); goForm();
+  });
+
+  // Verbal consent: speak the question, listen for haan/nahi.
+  document.getElementById("consentBtn").addEventListener("click", async () => {
+    await voiceSpeak(t("consent_q"));
+    voiceListen((text) => {
+      const ans = interpretYesNo(text);
+      const box = document.getElementById("consentMsg");
+      if (ans === "yes") {
+        box.className = "alert ok";
+        box.textContent = (getLang()==="hi"?"समझ गया: हाँ — आगे बढ़ रहे हैं…":"Understood: Yes — proceeding…");
+        localStorage.setItem("esewa_voicemode", "1");
+        setTimeout(goForm, 900);
+      } else if (ans === "no") {
+        box.className = "alert warn";
+        box.textContent = (getLang()==="hi"?"समझ गया: नहीं":"Understood: No");
+      } else {
+        box.className = "alert warn";
+        box.textContent = (getLang()==="hi"?"समझ नहीं आया — कृपया हाँ या नहीं बोलें":"Didn't catch that — say Yes or No") + ' ("' + (text||"") + '")';
+      }
+    });
+  });
+
+  // Auto voice-over if arriving in voice mode.
+  if (localStorage.getItem("esewa_voicemode") === "1") {
+    window.addEventListener("load", () => setTimeout(() => voiceSpeak(pageSpeech()), 400));
+  }
+</script>

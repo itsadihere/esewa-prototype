@@ -1,0 +1,48 @@
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eSewa MP — Track Status</title>
+<link rel="stylesheet" href="css/style.css">
+
+<div class="gov-strip" data-i18n="govt_mp">मध्य प्रदेश शासन</div>
+<header class="site-header">
+  <div class="bar">
+    <a href="index.html" class="logo-badge" style="text-decoration:none">MP<br>eSEVA</a>
+    <div class="brand">
+      <h1 data-i18n="track_title">आवेदन की स्थिति</h1>
+      <p class="muted" id="trackRef">—</p>
+    </div>
+    <div class="header-actions"><button class="lang-toggle">English</button></div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="card">
+    <div class="steps" id="steps"></div>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="timeline_label">प्रक्रिया समयरेखा</h2>
+    <ul class="tl" id="timeline"></ul>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="sms_at_stage">नागरिक को प्राप्त एसएमएस <span class="badge new">नया</span></h2>
+    <div id="smsLog"></div>
+  </div>
+
+  <!-- Demo control panel -->
+  <div class="card" style="border:2px dashed var(--saffron)">
+    <div class="spread mb">
+      <b style="color:var(--amber)">🎬 <span data-i18n="demo_controls">डेमो कंट्रोल — नागरिक को नहीं दिखता</span></b>
+    </div>
+    <button class="btn block" id="advBtn" data-i18n="advance_stage">अगले चरण पर जाएँ</button>
+    <button class="btn block secondary mt" id="resetBtn" data-i18n="reset_stage">जमा पर रीसेट करें</button>
+  </div>
+</main>
+
+<script src="js/db.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/tracking.js"></script>
+<script src="js/presenter.js"></script>

@@ -1,0 +1,35 @@
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eSewa MP — Domicile Application</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/form.css">
+
+<div class="form-shell">
+  <div class="form-progress"><div class="fill" id="progFill"></div></div>
+
+  <div class="form-topbar">
+    <span class="count"><span id="qNow">1</span> <span data-i18n="q_of">में से</span> <span id="qTotal">1</span></span>
+    <div class="row" style="gap:8px">
+      <span class="badge simple" data-i18n="simplified">सरल</span>
+      <button class="lang-toggle" style="min-height:40px;min-width:56px">English</button>
+    </div>
+  </div>
+
+  <div class="q-stage">
+    <div class="q-inner" id="qInner"><!-- rendered by form.js --></div>
+  </div>
+
+  <div class="form-nav">
+    <div class="inner">
+      <button class="btn secondary" id="backBtn" data-i18n="back">पीछे</button>
+      <button class="btn" id="nextBtn" data-i18n="next">आगे</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/db.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/form.js"></script>
+<script src="js/presenter.js"></script>
