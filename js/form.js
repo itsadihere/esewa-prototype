@@ -185,9 +185,16 @@
   function renderInput(q) {
     let control;
     if (q.type === "select") {
-      control = `<select id="qInput"><option value="">—</option>` +
-        q.options.map((o, i) => `<option value="${optRaw(o)}" ${answers[q.id] === optRaw(o) ? "selected" : ""}>${optLabel(o)}</option>`).join("") +
-        `</select>`;
+      const rows = q.options.map(o => {
+        const raw = optRaw(o), lab = optLabel(o), sel = answers[q.id] === raw;
+        return `<div class="opt ${sel ? "sel" : ""}" data-val="${(raw + "").replace(/"/g, "&quot;")}">
+          <button class="opt-speak" data-say="${(lab + "").replace(/"/g, "&quot;")}" title="🔊">🔊</button>
+          <span class="opt-label">${lab}</span><span class="opt-check">${sel ? "✓" : ""}</span></div>`;
+      }).join("");
+      return `<div class="q-sub">${getLang() === "hi" ? "विकल्प सुनने हेतु 🔊 दबाएँ · चुनने हेतु टैप करें या 🎤 से बोलें" : "Tap 🔊 to hear an option · tap to choose, or use 🎤 to speak"}</div>
+        <div class="opt-list" id="optList">${rows}</div>
+        <div class="voice-hint-row"><button class="mic-btn" id="fieldMic">🎤</button><span class="muted">${getLang() === "hi" ? "बोलकर चुनें" : "Choose by voice"}</span></div>
+        <div class="field-error hidden" id="qErr">${t("required_field")}</div>`;
     } else if (q.type === "toggle") {
       const on = answers[q.id];
       return `<div class="switch-row">
@@ -283,6 +290,27 @@
       return;
     }
 
+    if (q.type === "select") {
+      const list = document.getElementById("optList");
+      list.querySelectorAll(".opt-speak").forEach(b => b.addEventListener("click", e => {
+        e.stopPropagation();
+        list.querySelectorAll(".opt-speak").forEach(x => x.classList.remove("playing"));
+        b.classList.add("playing");
+        voiceSpeak(b.dataset.say).then(() => b.classList.remove("playing"));
+      }));
+      list.querySelectorAll(".opt").forEach(el => el.addEventListener("click", e => {
+        if (e.target.closest(".opt-speak")) return;
+        answers[q.id] = el.dataset.val; saveAnswers();
+        list.querySelectorAll(".opt").forEach(x => { x.classList.remove("sel"); x.querySelector(".opt-check").textContent = ""; });
+        el.classList.add("sel"); el.querySelector(".opt-check").textContent = "✓";
+        const er = document.getElementById("qErr"); if (er) er.classList.add("hidden");
+        voiceSpeak(el.querySelector(".opt-label").textContent);
+      }));
+      const mic = document.getElementById("fieldMic");
+      if (mic) bindMic(mic, (text) => pickBestOption(q, text));
+      return;
+    }
+
     const inp = document.getElementById("qInput");
     if (inp) {
       const commit = () => { answers[q.id] = inp.value; saveAnswers(); if (q.suggest) showSuggest(q); };
@@ -327,7 +355,7 @@
     });
   }
 
-  // Voice: fetched field readback + yes/no.
+  // Voice: fetched field readback + yes/no; selects read out all options.
   function speakQuestion(q) {
     if (q.type === "display") { voiceSpeak(t(q.labelKey) + ": " + answers[q.id]); return; }
     if (q.type === "fetched") {
@@ -335,6 +363,9 @@
         ? `आपका ${t(q.labelKey)} ${answers[q.id]} है — क्या सही है?`
         : `Your ${t(q.labelKey)} is ${answers[q.id]} — is this correct?`;
       voiceSpeak(phrase);
+    } else if (q.type === "select") {
+      const opts = q.options.map((o, i) => (i + 1) + ". " + optLabel(o)).join(", ");
+      voiceSpeak(t(q.labelKey) + ". " + (getLang() === "hi" ? "विकल्प" : "Options") + ": " + opts);
     } else {
       voiceSpeak(t(q.labelKey));
     }
@@ -360,11 +391,18 @@
   }
 
   function pickBestOption(q, text) {
-    const sel = document.getElementById("qInput");
     const low = (text || "").toLowerCase();
     let best = null;
     q.options.forEach(o => { if (optLabel(o).toLowerCase().includes(low) || low.includes(optLabel(o).toLowerCase().split(" ")[0])) best = o; });
-    if (best) { sel.value = optRaw(best); answers[q.id] = optRaw(best); saveAnswers(); showToast(optLabel(best)); }
+    if (!best) { voiceSpeak(getLang() === "hi" ? "समझ नहीं आया, कृपया विकल्प चुनें" : "Didn't catch that, please pick an option"); return; }
+    answers[q.id] = optRaw(best); saveAnswers();
+    const list = document.getElementById("optList");
+    if (list) list.querySelectorAll(".opt").forEach(x => {
+      const s = x.dataset.val === optRaw(best);
+      x.classList.toggle("sel", s); x.querySelector(".opt-check").textContent = s ? "✓" : "";
+    });
+    const er = document.getElementById("qErr"); if (er) er.classList.add("hidden");
+    voiceSpeak(optLabel(best)); showToast(optLabel(best));
   }
 
   // Show the top-5 heard alternatives as tappable chips.

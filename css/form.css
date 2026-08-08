@@ -55,6 +55,17 @@
 .yn-row { display: flex; gap: 12px; margin-top: 8px; }
 .yn-row .btn { flex: 1; }
 
+/* Spoken option list (accessible dropdown replacement) */
+.opt-list { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+.opt { display: flex; align-items: center; gap: 10px; border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 14px; cursor: pointer; background: var(--white); }
+.opt:hover { border-color: var(--blue); }
+.opt.sel { border-color: var(--blue); background: var(--blue-light); }
+.opt-label { flex: 1; font-size: 17px; font-weight: 600; line-height: 1.35; }
+.opt-speak { min-width: 46px; min-height: 46px; border: 1.5px solid var(--blue); background: var(--white); color: var(--blue); border-radius: 10px; font-size: 19px; cursor: pointer; flex-shrink: 0; }
+.opt-speak.playing { background: var(--blue); color: #fff; animation: pulse 1s infinite; }
+.opt-check { color: var(--green); font-weight: 800; font-size: 18px; width: 18px; flex-shrink: 0; }
+.voice-hint-row { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+
 /* Bottom nav */
 .form-nav {
   position: fixed; left: 0; right: 0; bottom: 0; background: var(--white);
