@@ -197,11 +197,12 @@
         <div class="field-error hidden" id="qErr">${t("required_field")}</div>`;
     } else if (q.type === "toggle") {
       const on = answers[q.id];
-      return `<div class="switch-row">
-          <span>${t("q_digilocker")}</span>
-          <label class="switch"><input type="checkbox" id="qToggle" ${on ? "checked" : ""}><span class="slider"></span></label>
+      return `<div class="q-sub">${t("q_digilocker")}</div>
+        <div class="yn-row">
+          <button class="btn ${on ? "" : "secondary"}" id="tgYes">✓ ${t("yes")}</button>
+          <button class="btn ${on ? "secondary" : ""}" id="tgNo">✗ ${t("no")}</button>
         </div>
-        ${voiceMode ? `<button class="btn secondary block mt" id="fieldMic">🎤 ${t("yes")} / ${t("no")}</button>` : ""}`;
+        ${voiceMode ? `<div class="voice-hint-row"><button class="mic-btn" id="fieldMic">🎤</button><span class="muted">${getLang() === "hi" ? "बोलकर उत्तर दें" : "Answer by voice"}</span></div>` : ""}`;
     } else if (q.type === "children") {
       const kids = answers[q.id] || [];
       const rows = kids.map((c, i) => `
@@ -256,13 +257,17 @@
     }
 
     if (q.type === "toggle") {
-      const tg = document.getElementById("qToggle");
-      tg.addEventListener("change", () => { answers[q.id] = tg.checked; saveAnswers(); });
+      const yesB = document.getElementById("tgYes"), noB = document.getElementById("tgNo");
+      const setTg = v => {
+        answers[q.id] = v; saveAnswers();
+        yesB.className = "btn " + (v ? "" : "secondary");
+        noB.className = "btn " + (v ? "secondary" : "");
+        voiceSpeak(v ? t("yes") : t("no"));
+      };
+      yesB.onclick = () => setTg(true);
+      noB.onclick = () => setTg(false);
       const mic = document.getElementById("fieldMic");
-      if (mic) bindMic(mic, (text) => {
-        const yn = interpretYesNo(text);
-        if (yn) { tg.checked = yn === "yes"; answers[q.id] = tg.checked; saveAnswers(); }
-      });
+      if (mic) bindMic(mic, (text) => { const yn = interpretYesNo(text); if (yn) setTg(yn === "yes"); });
       return;
     }
 

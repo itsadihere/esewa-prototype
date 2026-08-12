@@ -86,15 +86,31 @@
   renderDocs();
   document.addEventListener("langchange", renderDocs);
 
+  function scriptDocs() { return REQUIRED_DOCS.map(d => getLang()==="hi"?d.hi:d.en); }
   function pageSpeech() {
-    return [t("svc_info_title"), t("sla_label") + ": " + t("sla_value"),
-            t("lok_seva_ref"), t("fee_slabs"),
-            t("docs_required") + ": " + REQUIRED_DOCS.map(d => getLang()==="hi"?d.hi:d.en).join(", ")].join(". ");
+    const docs = scriptDocs();
+    if (getLang() === "hi") {
+      return `नमस्ते। यह मूल निवास प्रमाण पत्र सेवा है, जो मध्य प्रदेश शासन द्वारा दी जाती है। `
+        + `इस प्रमाण पत्र के लिए आपको ${docs.length} दस्तावेज़ चाहिए — ${docs.join(", ")}। `
+        + `आवेदन जमा करने के बाद, प्रमाण पत्र सात कार्य दिवसों के भीतर बन जाता है, जो मध्य प्रदेश लोक सेवा गारंटी अधिनियम दो हज़ार दस के अंतर्गत सुनिश्चित है। `
+        + `शुल्क आपकी श्रेणी पर निर्भर करता है — सामान्य वर्ग के लिए पचास रुपये, अन्य पिछड़ा वर्ग के लिए तीस रुपये, अनुसूचित जाति और जनजाति के लिए बीस रुपये, और बी पी एल कार्ड धारकों के लिए यह सेवा निःशुल्क है। `
+        + `आगे बढ़ने के लिए, बातों बातों में फॉर्म भरिये बटन दबाएँ।`;
+    }
+    return `Hello. This is the Domicile Certificate service, provided by the Government of Madhya Pradesh. `
+      + `For this certificate you need ${docs.length} documents — ${docs.join(", ")}. `
+      + `After you submit your application, the certificate is issued within seven working days, guaranteed under the Madhya Pradesh Public Service Guarantee Act, 2010. `
+      + `The fee depends on your category — fifty rupees for General, thirty rupees for O B C, twenty rupees for S C and S T, and free for B P L card holders. `
+      + `To continue, tap the fill the form by talking button.`;
+  }
+  function docsSpeech() {
+    const docs = scriptDocs();
+    return getLang() === "hi"
+      ? `इस प्रमाण पत्र के लिए आवश्यक दस्तावेज़ हैं — ${docs.join(", ")}। कृपया इन्हें तैयार रखें।`
+      : `The documents required for this certificate are — ${docs.join(", ")}. Please keep them ready.`;
   }
 
   document.getElementById("readPageBtn").addEventListener("click", () => voiceSpeak(pageSpeech()));
-  document.getElementById("readDocsBtn").addEventListener("click", () =>
-    voiceSpeak(t("docs_required") + ": " + REQUIRED_DOCS.map(d => getLang()==="hi"?d.hi:d.en).join(", ")));
+  document.getElementById("readDocsBtn").addEventListener("click", () => voiceSpeak(docsSpeech()));
 
   const dlBtn = document.getElementById("digilockerBtn");
   dlBtn.addEventListener("click", () => {
